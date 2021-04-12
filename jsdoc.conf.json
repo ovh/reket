@@ -1,0 +1,21 @@
+{
+  "source": {
+    "include": ["packages/reket-core/src"],
+    "includePattern": ".+\\.js$",
+    "excludePattern": ".+\\.spec.js$"
+  },
+  "opts": {
+    "destination": "docs/jsdoc",
+    "recurse": true,
+    "private": true,
+    "template": "node_modules/better-docs",
+    "readme": "./README.md"
+  },
+  "templates": {
+    "search": true,
+    "better-docs": {
+      "name": "Reket"
+    }
+  },
+  "plugins": ["plugins/markdown"]
+}

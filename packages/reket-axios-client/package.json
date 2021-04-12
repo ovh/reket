@@ -1,0 +1,36 @@
+{
+  "name": "@ovhcloud/reket-axios-client",
+  "version": "0.0.0",
+  "description": "axios client implementation for Reket",
+  "keywords": [
+    "reket",
+    "axios",
+    "client",
+    "http",
+    "ovhcloud"
+  ],
+  "license": "Apache-2.0",
+  "author": "OVH SAS",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "browser": "./dist/umd/axios-client.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup -c --environment BUILD:production",
+    "dev": "rollup -c --environment BUILD:development",
+    "dev:watch": "yarn run dev --watch",
+    "test": "jest --config ../../jest.config.js"
+  },
+  "dependencies": {
+    "@ovhcloud/reket-core": "^0.0.0",
+    "axios": "^0.21.1"
+  },
+  "devDependencies": {
+    "@ovh-ux/component-rollup-config": "^9.0.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "*.js": ["eslint --fix"],
+  "!(*CHANGELOG).md": ["remark -qf .", "eslint --ext .md --fix"],
+  "**/package.json": ["npx sort-package-json"],
+  "*.json": ["prettier --write"]
+}

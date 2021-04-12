@@ -1,0 +1,50 @@
+{
+  "name": "@ovhcloud/reket",
+  "private": true,
+  "license": "Apache-2.0",
+  "author": "OVH SAS",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "lerna run build",
+    "docs": "jsdoc -c jsdoc.conf.json",
+    "docs:start": "yarn run docs && npx serve ./docs/jsdoc",
+    "format": "run-p format:*",
+    "format:js": "yarn run lint:js --fix",
+    "format:md": "yarn run lint:md --fix",
+    "lint": "run-p lint:*",
+    "lint:js": "eslint --cache --quiet --format=pretty \"packages\"",
+    "lint:md": "remark -qf . && eslint --quiet --format=pretty --ext .md .",
+    "postinstall": "husky install",
+    "publish": "lerna publish from-package --yes",
+    "test": "lerna run test",
+    "version": "lerna version --conventional-commits --yes"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^12.1.1",
+    "@commitlint/config-angular": "^12.1.1",
+    "babel-eslint": "^10.0.3",
+    "babel-jest": "^26.6.3",
+    "better-docs": "^2.3.2",
+    "eslint": "^7.20.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-formatter-pretty": "^4.0.0",
+    "eslint-import-resolver-lerna": "^2.0.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.1.5",
+    "eslint-plugin-markdown": "^2.0.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "husky": "^6.0.0",
+    "jest": "^26.6.3",
+    "jsdoc": "^3.6.6",
+    "lerna": "^4.0.0",
+    "lint-staged": "^10.5.4",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.2.1",
+    "remark-cli": "^9.0.0",
+    "remark-lint": "^8.0.0",
+    "remark-preset-lint-recommended": "^5.0.0"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "@ovhcloud/reket-core",
+  "version": "0.0.0",
+  "description": "Base classes to override in order to use your preferred client",
+  "keywords": [
+    "reket",
+    "core",
+    "request",
+    "response",
+    "http",
+    "ovhcloud"
+  ],
+  "license": "Apache-2.0",
+  "author": "OVH SAS",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "browser": "./dist/umd/core.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup -c --environment BUILD:production",
+    "dev": "rollup -c --environment BUILD:development",
+    "dev:watch": "yarn run dev --watch",
+    "test": "jest --config ../../jest.config.js"
+  },
+  "devDependencies": {
+    "@ovh-ux/component-rollup-config": "^9.0.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

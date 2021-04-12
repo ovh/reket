@@ -21,6 +21,9 @@
     "test": "lerna run test",
     "version": "lerna version --conventional-commits --yes"
   },
+  "resolutions": {
+    "pug": "^3.0.1"
+  },
   "devDependencies": {
     "@commitlint/cli": "^12.1.1",
     "@commitlint/config-angular": "^12.1.1",

@@ -7,7 +7,7 @@ import { ReketRequest } from './request';
  * @classdesc
  * Main class of the component. This class implements all CRUD methods (get, post, put, delete).
  *
- * Simply configure a client (at least) and you will be abble to make HTTP calls.
+ * Simply configure a client (at least) and you will be able to make HTTP calls.
  *
  * @constructor
  * @param {ReketConfig|Object} config An instance of ReketConfig instance or an object with the

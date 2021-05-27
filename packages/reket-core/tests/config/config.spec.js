@@ -1,5 +1,4 @@
 import { ReketConfig } from '../../src/config/config';
-import { ReketConfigSsoAuth } from '../../src/config/sso-auth';
 import { ReketRequestType } from '../../src/request/type';
 import { ReketClient } from '../../src/client';
 
@@ -18,21 +17,17 @@ describe('ReketConfig instanciation', () => {
         urlPrefix: '/pey',
       },
     ],
-    ssoAuth: {},
   };
 
   test('it should instanciate ReketConfig without configuration', () => {
     const reketConfig = new ReketConfig();
 
     expect(reketConfig instanceof ReketConfig).toBe(true);
-    expect(reketConfig.ssoAuth).toBe(undefined);
     expect(reketConfig.client).toBe(undefined);
-    expect(reketConfig.isSsoAuthEnabled()).toBe(false);
   });
 
   test('it should instanciate ReketConfig with configuration', () => {
     const setClientSpy = jest.spyOn(ReketConfig.prototype, 'setClient');
-    const enableSsoAuthSpy = jest.spyOn(ReketConfig.prototype, 'enableSsoAuth');
     const addRequestTypesSpy = jest.spyOn(
       ReketConfig.prototype,
       'addRequestTypes',
@@ -42,49 +37,12 @@ describe('ReketConfig instanciation', () => {
 
     expect(reketConfig instanceof ReketConfig).toBe(true);
     expect(setClientSpy).toHaveBeenCalledWith(configOptions.client);
-    expect(enableSsoAuthSpy).toHaveBeenCalledWith(configOptions.ssoAuth);
     expect(addRequestTypesSpy).toHaveBeenCalledWith(configOptions.requestTypes);
-    expect(reketConfig.ssoAuth).not.toBe(undefined);
     expect(reketConfig.client).not.toBe(undefined);
-    expect(reketConfig.isSsoAuthEnabled()).toBe(true);
-  });
-
-  test('it should throw an error when enabling ssoAuth and no client is set', () => {
-    const reketConfig = new ReketConfig();
-
-    expect(() => {
-      reketConfig.enableSsoAuth({});
-    }).toThrow(Error);
   });
 });
 
 describe('ReketConfig.setConfig method', () => {
-  test('it should set ssoAuth configuration with an empty Object as configValue param', () => {
-    const enableSsoAuthSpy = jest.spyOn(ReketConfig.prototype, 'enableSsoAuth');
-    const reketConfig = new ReketConfig({
-      client: new MockReketClient(),
-    });
-    const ssoAuthConfig = {};
-
-    reketConfig.setConfig('ssoAuth', ssoAuthConfig);
-
-    expect(reketConfig.isSsoAuthEnabled()).toBe(true);
-    expect(enableSsoAuthSpy).toHaveBeenCalledWith(ssoAuthConfig);
-  });
-
-  test('it should set ssoAuth configuration with an instance of ReketConfigSsoAuth as configValue param', () => {
-    const enableSsoAuthSpy = jest.spyOn(ReketConfig.prototype, 'enableSsoAuth');
-    const reketConfig = new ReketConfig({
-      client: new MockReketClient(),
-    });
-    const ssoAuthConfig = new ReketConfigSsoAuth();
-
-    reketConfig.setConfig('ssoAuth', ssoAuthConfig);
-
-    expect(reketConfig.isSsoAuthEnabled()).toBe(true);
-    expect(enableSsoAuthSpy).toHaveBeenCalledWith(ssoAuthConfig);
-  });
-
   test('it should set requestTypes configuration', () => {
     const addRequestTypesSpy = jest.spyOn(
       ReketConfig.prototype,
@@ -121,34 +79,6 @@ describe('ReketConfig.setConfig method', () => {
     reketConfig.setConfig('urlPrefix', '/kel/klet');
 
     expect(reketConfig.urlPrefix).not.toBe('');
-  });
-});
-
-describe('ssoAuth configuration', () => {
-  test('it should enable ssoAuth and call ReketConfigSsoAuth.login method', () => {
-    const ssoAuthLoginSpy = jest.spyOn(ReketConfigSsoAuth.prototype, 'login');
-    const client = new MockReketClient();
-    const reketConfig = new ReketConfig({
-      client,
-    });
-
-    reketConfig.enableSsoAuth(new ReketConfigSsoAuth());
-
-    expect(reketConfig.isSsoAuthEnabled()).toBe(true);
-    expect(ssoAuthLoginSpy).toHaveBeenCalledWith(client);
-  });
-
-  it('should disable ssoAuth', () => {
-    const client = new MockReketClient();
-    const ssoAuht = new ReketConfigSsoAuth();
-    const reketConfig = new ReketConfig({
-      client,
-      ssoAuht,
-    });
-
-    reketConfig.disableSsoAuth();
-
-    expect(reketConfig.isSsoAuthEnabled()).toBe(false);
   });
 });
 

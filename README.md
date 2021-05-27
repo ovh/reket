@@ -76,36 +76,6 @@ import Reket from '@ovhcloud/reket-axios-client';
 Reket.setConfig('urlPrefix', '/shi/foo/me');
 ```
 
-#### ssoAuth
-
-If you are using single sign on for your authentication, this option will be useful to manage it.
-
-```js
-import Reket from '@ovhcloud/reket-axios-client';
-
-Reket.setConfig(
-  'ssoAuth',
-  {
-    loginUrl: '/auth',
-    logoutUrl: '/auth/disconnect',
-    userUrl: '/shi/foo/me',
-  },
-  {
-    onLoginSuccess: (userData) => {
-      // do some check of the user
-    },
-  },
-);
-```
-
-Here are the available options for `ssoAuth` configuration:
-- urls:
-  - `userUrl`: by setting the `ssoAuth`, `Reket` will automatically send a request to this `userUrl` in order to determine if the user is authenticated or not. In case of non authenticated user, a redirection will be made to the `loginUrl`.
-  - `loginUrl`: if a user is not authenticated, he will be redirected to this URL in order to authenticate.
-  - `logoutUrl`: a user will be redirected to it if his session expires.
-- callbacks:
-  - `onLoginSuccess`: if login is successful, you can check some informations in order to perform other actions first (e.g. redirect him to his profile page in order to update it).
-
 ## How to use a non existing client?
 
 First you need to create a ReketClient by overriding the `ReketClient` class.
@@ -151,7 +121,6 @@ All your previous code stay the same, the only change that is made is that the H
 
 ## What's next?
 
-- Make sso auth redirection more configurable. For now, we simply add a onsuccess param to the login/logout URL. This should be configurable to more cases
 - Create an AngularJS wrapper
 - Add more clients
 

@@ -40,17 +40,6 @@ export class Reket {
     return this.#config.client;
   }
 
-  /**
-   * Shortcut to get the configured ssoAuth from config.
-   *
-   * @name Reket#ssoAuth
-   * @type {ReketConfigSsoAuth}
-   * @readonly
-   */
-  get ssoAuth() {
-    return this.#config.ssoAuth;
-  }
-
   constructor(config = {}) {
     this.setConfig(config);
   }
@@ -79,23 +68,6 @@ export class Reket {
   }
 
   /**
-   * Set sso auth enabled for requesting.
-   *
-   * This is a shortcut of:
-   * ```
-   * Reket.setConfig('ssoAuth', { // add ssoAuth options });
-   * ```
-   * @param  {ReketConfigSsoAuth|Object} ssoAuthConfig The options for configuring the ssoAuth.
-   * @return this
-   *
-   * @see {@link ReketConfigSsoAuth} constructor for available options for ssoAuthConfig parameter.
-   */
-  enableSsoAuth(ssoAuthConfig) {
-    this.#config.enableSsoAuth(ssoAuthConfig);
-    return this;
-  }
-
-  /**
    * Send an HTTP request with the configured client.
    * @param  {ReketRequest} reketRequest An instance of ReketRequest as options.
    * @return {Promise}  That returns an instance of ReketResponse in case of success,
@@ -109,69 +81,15 @@ export class Reket {
       }`,
     });
 
-    const loginPromise = this.config.isSsoAuthEnabled()
-      ? this.ssoAuth.loginDeferred.promise
-      : Promise.resolve(true);
+    return this.client.request(reketRequest).then((reketResponse) => {
+      if (!(reketResponse instanceof ReketResponse)) {
+        throw new Error(
+          'Your client request must return an instance of ReketResponse',
+        );
+      }
 
-    return (
-      loginPromise
-        // wait for login promise before sending the request with the configured client
-        .then(() =>
-          this.client
-            .request(reketRequest)
-            .then((reketResponse) => {
-              if (!(reketResponse instanceof ReketResponse)) {
-                throw new Error(
-                  'Your client request must return an instance of ReketResponse',
-                );
-              }
-
-              return reketResponse;
-            })
-            .catch((response) => {
-              const error = response;
-              if (this.config.isSsoAuthEnabled()) {
-                return this.ssoAuth.isLogged().then((isLogged) => {
-                  if (
-                    error.status === 403 &&
-                    (error.data.message === 'This session is forbidden' ||
-                      error.data.message === 'This session is invalid')
-                  ) {
-                    // consider a 401 if previous case is matched
-                    error.status = 401;
-                  }
-
-                  // Redirect on 401
-                  if (error.status === 401 && !error.config.preventLogout) {
-                    this.ssoAuth.logout();
-                    return Promise.reject(error);
-                  }
-
-                  // If CODE 471 AKA Low-order session
-                  if (error.status === 471) {
-                    this.ssoAuth.redirectToLoginPage();
-                    return Promise.reject(error);
-                  }
-
-                  // Force logout
-                  if (
-                    (!error.config || !error.config.noAuthenticate) &&
-                    !isLogged
-                  ) {
-                    this.ssoAuth.logout();
-                    return Promise.reject(error);
-                  }
-
-                  // Reject the response
-                  return Promise.reject(error);
-                });
-              }
-
-              // if no specific error reject the error
-              return Promise.reject(error);
-            }),
-        )
-    );
+      return reketResponse;
+    });
   }
 
   /**

@@ -1,5 +1,4 @@
 import { ReketClient } from '../client';
-import { ReketConfigSsoAuth } from './sso-auth';
 import { ReketRequestType } from '../request';
 
 import { AVAILABLE_CONFIG_NAMES } from './constants';
@@ -12,17 +11,12 @@ import { AVAILABLE_CONFIG_NAMES } from './constants';
  * @constructor
  * @param {Object}                    options                   Options for creating an instance of
  *                                                              ReketConfig.
- * @param {ReketConfigSsoAuth|Object} [options.ssoAuth]         The sso auth configuration if
- *                                                              needed.
  * @param {ReketClient}               [options.client]          The client that will be used by the core.
  * @param {Array<ReketRequestType>}   [options.requestTypes=[]] A list of request types that can be
  *                                                              used to predifine some url prefix.
  * @param {string}                    [urlPrefix='']            A global/default url prefix that
  *                                                              will be used if none provided by
  *                                                              the request.
- *
- * @see {@link ReketConfigSsoAuth} constructor for available options in case of `ssoAuth`
- *                                 parameter is an Object.
  */
 export class ReketConfig {
   /**
@@ -32,16 +26,6 @@ export class ReketConfig {
    * @private
    */
   #config = new Map();
-
-  /**
-   * The SSO Auth config that will be used by the core.
-   * @name ReketConfig#ssoAuth
-   * @type {ReketConfigSsoAuth}
-   * @readonly
-   */
-  get ssoAuth() {
-    return this.#config.get('ssoAuth');
-  }
 
   /**
    * The ReketClient instance that will be used for making HTTP requests.
@@ -73,13 +57,9 @@ export class ReketConfig {
     return this.#config.get('urlPrefix');
   }
 
-  constructor({ ssoAuth, client, requestTypes = [], urlPrefix = '' } = {}) {
+  constructor({ client, requestTypes = [], urlPrefix = '' } = {}) {
     if (client) {
       this.setClient(client);
-    }
-
-    if (ssoAuth) {
-      this.enableSsoAuth(ssoAuth);
     }
 
     // create a requestTypes entry in config Map
@@ -103,91 +83,16 @@ export class ReketConfig {
       );
     }
 
-    // special case of ssoAuth
-    if (configName === 'ssoAuth') {
-      return this.enableSsoAuth(configValue);
+    switch (configName) {
+      case 'client':
+        return this.setClient(configValue);
+      case 'requestTypes':
+        return this.addRequestTypes(configValue);
+      default:
+        this.#config.set(configName, configValue);
+        return this;
     }
-
-    if (configName === 'client') {
-      return this.setClient(configValue);
-    }
-
-    if (configName === 'requestTypes') {
-      return this.addRequestTypes(configValue);
-    }
-
-    this.#config.set(configName, configValue);
-    return this;
   }
-
-  /*= =============================================
-  =            SSO Auth configuration            =
-  ============================================== */
-
-  /**
-   * Enable SSO Auth for Reket with its configuration.
-   *
-   * As this method is calling `login` method, client configuration must be setted before calling
-   * this method.
-   *
-   * This method is a shortcut of:
-   * ```
-   * ReketConfig.setConfig('ssoAuth', { // add ssoAuth options });
-   * ```
-   * @param  {ReketConfigSsoAuth|Object} ssoAuthConfig The sso auth configuration.
-   * @return this
-   *
-   * @see {@link ReketConfigSsoAuth}  constructor for available options in case of `ssoAuthConfig`
-   *                                  parameter is an Object.
-   */
-  enableSsoAuth(ssoAuthConfig = {}) {
-    if (!this.client) {
-      throw new Error(
-        '[ReketConfig.enableSsoAuth]: Please set client before enabling SSO auth in order to use it to check login',
-      );
-    }
-
-    if (
-      !(ssoAuthConfig instanceof ReketConfigSsoAuth) &&
-      typeof ssoAuthConfig !== 'object'
-    ) {
-      throw new Error(
-        `[ReketConfig.enableSsoAuth]: ssoAuthConfig must be an Object or an instance of ReketConfigSsoAuth. ${typeof ssoAuthConfig} given.`,
-      );
-    }
-
-    let config = ssoAuthConfig;
-
-    if (
-      !(ssoAuthConfig instanceof ReketConfigSsoAuth) &&
-      typeof ssoAuthConfig === 'object'
-    ) {
-      config = new ReketConfigSsoAuth(ssoAuthConfig);
-    }
-
-    this.#config.set('ssoAuth', config);
-    this.ssoAuth.login(this.client);
-    return this;
-  }
-
-  /**
-   * Disable Sso Auth configuration by reseting it.
-   * @return this
-   */
-  disableSsoAuth() {
-    this.#config.delete('ssoAuth');
-    return this;
-  }
-
-  /**
-   * Helpers to easily knowing if sso auth is enabled or not.
-   * @return {Boolean} `true` if sso auth has been configured, `false` otherwise.
-   */
-  isSsoAuthEnabled() {
-    return this.#config.has('ssoAuth');
-  }
-
-  /*= ====  End of SSO Auth configuration  ====== */
 
   /*= ===================================================
   =            Requests types configuration            =

@@ -37,34 +37,43 @@ export class Reket {
    * @readonly
    */
   get client() {
-    return this.#config.client;
+    return this.#config.client.value;
   }
 
-  constructor(config = {}) {
-    this.setConfig(config);
+  get hooks() {
+    return this.#config.hooks;
   }
 
-  /**
-   * Set a configuration item.
-   *
-   * @param {ReketConfig|Object|string} config  A ReketConfig instance, an object with the options
-   *                                            to create a ReketConfig instance or a string that
-   *                                            will set or update a single configuration item.
-   * @param {*} [value]                         The value to set to specific configuration item.
-   * @return this
-   */
-  setConfig(config, value) {
-    if (!value) {
-      if (config instanceof ReketConfig) {
-        this.#config = config;
-      } else if (typeof config === 'object') {
-        this.#config = new ReketConfig(config);
-      }
-    } else {
-      this.#config.setConfig(config, value);
+  get requestTypes() {
+    return this.#config.requestTypes;
+  }
+
+  get urlPrefix() {
+    return this.#config.urlPrefix.value;
+  }
+
+  getRequestUrlPrefix(reketRequest) {
+    // get the url prefix of the http request if defined
+    if (reketRequest.urlPrefix) {
+      return reketRequest.urlPrefix;
     }
 
-    return this;
+    // return the global configured url prefix
+    // if no requests types defined
+    if (!this.requestTypes.size) {
+      return this.urlPrefix || '';
+    }
+
+    // get the prefix from request request type
+    if (reketRequest.requestType) {
+      return (
+        this.requestTypes.getUrlPrefix(reketRequest.requestType) ||
+        this.urlPrefix
+      );
+    }
+
+    // return the url prefix from the default requestType (the first one of the list)
+    return this.requestTypes.getDefaultUrlPrefix() || '';
   }
 
   /**
@@ -76,20 +85,29 @@ export class Reket {
   request(reketRequest) {
     // determine url from request options
     Object.assign(reketRequest, {
-      url: `${this.#config.getRequestUrlPrefix(reketRequest)}${
-        reketRequest.url
-      }`,
+      url: `${this.getRequestUrlPrefix(reketRequest)}${reketRequest.url}`,
     });
 
-    return this.client.request(reketRequest).then((reketResponse) => {
-      if (!(reketResponse instanceof ReketResponse)) {
-        throw new Error(
-          'Your client request must return an instance of ReketResponse',
-        );
-      }
+    return this.client
+      .request(reketRequest)
+      .then((reketResponse) => {
+        if (!(reketResponse instanceof ReketResponse)) {
+          throw new Error(
+            'Your client request must return an instance of ReketResponse',
+          );
+        }
 
-      return reketResponse;
-    });
+        return this.hooks.response.onSuccess
+          ? this.hooks.response.onSuccess(reketResponse)
+          : reketResponse;
+      })
+      .catch((reketError) =>
+        Promise.reject(
+          this.hooks.response.onError
+            ? this.hooks.response.onError(reketError)
+            : reketError,
+        ),
+      );
   }
 
   /**

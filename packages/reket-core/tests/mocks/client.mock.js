@@ -1,4 +1,4 @@
-import { ReketClient } from '../../src';
+import { ReketClient, ReketResponse, ReketError } from '../../src';
 
 export class MockReketClient extends ReketClient {
   constructor(responseData, reject = false) {
@@ -9,8 +9,8 @@ export class MockReketClient extends ReketClient {
 
   request() {
     return !this.reject
-      ? Promise.resolve(this.responseData)
-      : Promise.reject(this.responseData);
+      ? Promise.resolve(new ReketResponse(this.responseData))
+      : Promise.reject(new ReketError(this.responseData));
   }
 }
 

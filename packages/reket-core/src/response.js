@@ -1,116 +1,144 @@
 /**
- * @class ReketResponse
- * @classdesc
+ * Represent a Reket response structure base. Non readonly attributes depend of the HTTP call.
+ * @typedef {Object<string, *>|Array}   ReketResponse
  *
- * @constructor
- * @param {Object} clientResponse             The response returned by the client.
- * @param {Object} clientResponse.config      The original config of the request.
- * @param {*}      clientResponse.data        The data returned by the HTTP call.
- * @param {Object} clientResponse.headers     The response headers returned by the HTTP call.
- * @param {Object} clientResponse.request     The original request that has been send.
- * @param {string} clientResponse.status      The response status (e.g. 200, 304, ...)
- * @param {string} clientResponse.statusText  The status text of the response (e.g. "OK",
- *                                            "Not Modified", ...)
+ * @property {Object} getConfig         readonly property that expose the original config of
+ *                                      the request.
+ * @property {Object} getHeaders        readonly property that expose the response headers returned
+ *                                      by the HTTP call.
+ * @property {Object} getRequest        readonly property that expose the original request that
+ *                                      has been send.
+ * @property {string} getStatus         readonly property that expose the response status
+ *                                      (e.g. 200, 304, ...).
+ * @property {string} getStatusText     readonly property that expose the status text of
+ *                                      the response (e.g. "OK", "Not Modified", ...).
+ * @property {bool}   _isReketResponse  readonly and internal only property.
  */
-export class ReketResponse {
-  /**
-   * The original config of the request.
-   * @name ReketResponse#config
-   * @type {Object}
-   * @private
-   */
-  #config;
 
-  /**
-   * The response headers returned by the HTTP call.
-   * @name ReketResponse#headers
-   * @type {Object}
-   * @private
-   */
-  #headers;
+/**
+ * Creates a response with data exposed and other response attributes exposed as readonly.
+ * This format will avoid having to access `response.data`` in order to get the data.
+ * Imagine we have a HTTP with response promise as follow:
+ * ```
+ * "data": {
+ *   "shi": "ming",
+ *   "foo": "bar",
+ *  "me": "zot"
+ * },
+ * "headers": {
+ *   ...
+ * }
+ * ```
+ * To access data in the promise you have to do something like:
+ * ```
+ * Reket.get('/my/url').then((response) => {
+ *   const foo = response.data.foo;
+ *   // or const { foo } = response.data;
+ *   // and then access the headers
+ *   const headers = response.headers;
+ * });
+ * ```
+ *
+ * With ReketResponse format it's possible to get directly foo from response like so:
+ * ```
+ * Reket.get('/my/url').then((response) => {
+ *   const foo = response.foo;
+ *   // or const { foo } = response;
+ *   // and then access the headers
+ *   const headers = response.getHeaders;
+ * });
+ * ```
+ *
+ * @param  {*}      options.data       The data returned by the HTTP call.
+ * @param  {Object} options.config     The original config of the request.
+ * @param  {Object} options.headers    The response headers returned by the HTTP call.
+ * @param  {Object} options.request    The original request that has been send.
+ * @param  {string} options.status     The response status (e.g. 200, 304, ...)
+ * @param  {string} options.statusText The status text of the response (e.g. "OK",
+ *                                     "Not Modified", ...)
+ *
+ * @return {ReketResponse}
+ */
 
-  /**
-   * The original request that has been send.
-   * @name ReketResponse#request
-   * @type {Object}
-   * @private
-   */
-  #request;
 
-  /**
-   * The response status (e.g. 200, 304, ...)
-   * @name ReketResponse#status
-   * @type {string}
-   * @private
-   */
-  #status;
 
-  /**
-   * The status text of the response (e.g. "OK", "Not Modified", ...)
-   * @name ReketResponse#statusText
-   * @type {string}
-   * @private
-   */
-  #statusText;
+export const buildReketResponse = ({ data, config, headers, request, status, statusText }) => {
+  let props = {};
+  let responseData = data;
+  let response = {};
 
-  constructor(clientResponse) {
-    const { data } = clientResponse;
-
-    if (data instanceof Object) {
-      Object.assign(this, data);
-    } else {
-      this.data = data;
+  // detect type of response data
+  if (!Array.isArray(responseData)) {
+    // if not an array (Object, string, number, ...)
+    if (typeof responseData !== 'object') {
+      // and not an object (number, string, null, ...).
+      // Treat it as an object and wrap data into an object with value as key.
+      // If HTTP data response is `"response"` the reket response object will look like:
+      //
+      // ```
+      // {
+      //   value: 'response'
+      // }
+      // ```
+      responseData = {
+        value: responseData,
+      };
     }
 
-    // set private members
-    this.#config = clientResponse.config;
-    this.#headers = clientResponse.headers;
-    this.#request = clientResponse.request;
-    this.#status = clientResponse.status;
-    this.#statusText = clientResponse.statusText;
+    // build an object with all properties of http call response.
+    // Those propertiess are enumerable in the Object, meaning that `Object.keys(obj)`
+    // will list that properties.
+    Object.keys(responseData).forEach((attrName) => {
+      props[attrName] = {
+        value: responseData[attrName],
+        writable: true,
+        enumerable: true,
+      };
+    });
+
+    Object.defineProperties(response, props);
+  } else {
+    // if response data is an array, do not modify it's prototype.
+    response = data;
   }
 
-  /**
-   * Get the original configuration of the request.
-   * @return {Object} The original config of the request.
-   */
-  getConfig() {
-    return this.#config;
-  }
+  // define the readonly properties of the response.
+  Object.defineProperties(response, {
+    getConfig: {
+      value: config,
+      writable: false,
+      enumerable: false,
+    },
+    getHeaders: {
+      value: headers,
+      writable: false,
+      enumerable: false,
+    },
+    getRequest: {
+      value: request,
+      writable: false,
+      enumerable: false,
+    },
+    getStatus: {
+      value: status,
+      writable: false,
+      enumerable: false,
+    },
+    getStatusText: {
+      value: statusText,
+      writable: false,
+      enumerable: false,
+    },
+    '_isReketResponse': {
+      value: true,
+      writable: false,
+      enumerable: false,
+    },
+  });
 
-  /**
-   * Get the response headers returned by the HTTP call.
-   * @return {Object} The response headers returned by the HTTP call.
-   */
-  getHeaders() {
-    return this.#headers;
-  }
-
-  /**
-   * Get the original request that has been send.
-   * @return {Object} The original request that has been send.
-   */
-  getRequest() {
-    return this.#request;
-  }
-
-  /**
-   * Get the response status.
-   * @return {string} The response status.
-   */
-  getStatus() {
-    return this.#status;
-  }
-
-  /**
-   * Get the status text of the response.
-   * @return {string} The status text of the response.
-   */
-  getStatusText() {
-    return this.#statusText;
-  }
-}
+  return response;
+};
 
 export default {
-  ReketResponse,
+  buildReketResponse,
 };

@@ -1,5 +1,4 @@
 import { ReketConfig } from './config';
-import { ReketResponse } from './response';
 import { ReketRequest } from './request';
 
 /**
@@ -91,9 +90,9 @@ export class Reket {
     return this.client
       .request(reketRequest)
       .then((reketResponse) => {
-        if (!(reketResponse instanceof ReketResponse)) {
+        if (!reketResponse._isReketResponse) {
           throw new Error(
-            'Your client request must return an instance of ReketResponse',
+            'Your client request must return a ReketResponse type by using buildReketResponse method.',
           );
         }
 

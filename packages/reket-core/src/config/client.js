@@ -1,9 +1,8 @@
 import { ReketConfigItem } from './item';
-import { ReketClient } from '../client';
 
 export class ReketConfigClient extends ReketConfigItem {
   set(reketClient) {
-    if (!(reketClient instanceof ReketClient)) {
+    if (Object.getPrototypeOf(reketClient.constructor).name !== 'ReketClient') {
       throw new Error(
         '[ReketConfigClient.set]: reketClient must be an instance of ReketClient.',
       );

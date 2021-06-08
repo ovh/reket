@@ -1,5 +1,1 @@
-import { AxiosReketClient } from './client';
-
-export default {
-  AxiosReketClient,
-};
+export * from './client';

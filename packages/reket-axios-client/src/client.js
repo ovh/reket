@@ -1,4 +1,4 @@
-import { ReketClient, ReketError, ReketResponse } from '@ovhcloud/reket-core';
+import { ReketClient, ReketError, buildReketResponse } from '@ovhcloud/reket-core';
 
 import axios from 'axios/dist/axios';
 
@@ -10,7 +10,7 @@ export class AxiosReketClient extends ReketClient {
   request(config = {}) {
     return this.client
       .request(config)
-      .then((response) => new ReketResponse(response))
+      .then((response) => buildReketResponse(response))
       .catch((error) =>
         Promise.reject(new ReketError(error.message, error.response)),
       );

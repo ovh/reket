@@ -90,7 +90,7 @@ export class Reket {
     return this.client
       .request(reketRequest)
       .then((reketResponse) => {
-        if (!reketResponse._isReketResponse) {
+        if (!reketResponse.isReketResponse) {
           throw new Error(
             'Your client request must return a ReketResponse type by using buildReketResponse method.',
           );
@@ -101,11 +101,9 @@ export class Reket {
           : reketResponse;
       })
       .catch((reketError) =>
-        Promise.reject(
-          this.hooks.response.onError
-            ? this.hooks.response.onError(reketError)
-            : reketError,
-        ),
+        this.hooks.response.onError
+          ? this.hooks.response.onError(reketError)
+          : Promise.reject(reketError),
       );
   }
 

@@ -2,17 +2,17 @@
  * Represent a Reket response structure base. Non readonly attributes depend of the HTTP call.
  * @typedef {Object<string, *>|Array}   ReketResponse
  *
- * @property {Object} getConfig         readonly property that expose the original config of
- *                                      the request.
- * @property {Object} getHeaders        readonly property that expose the response headers returned
- *                                      by the HTTP call.
- * @property {Object} getRequest        readonly property that expose the original request that
- *                                      has been send.
- * @property {string} getStatus         readonly property that expose the response status
- *                                      (e.g. 200, 304, ...).
- * @property {string} getStatusText     readonly property that expose the status text of
- *                                      the response (e.g. "OK", "Not Modified", ...).
- * @property {bool}   _isReketResponse  readonly and internal only property.
+ * @property {Object} getConfig       readonly property that expose the original config of
+ *                                    the request.
+ * @property {Object} getHeaders      readonly property that expose the response headers returned
+ *                                    by the HTTP call.
+ * @property {Object} getRequest      readonly property that expose the original request that
+ *                                    has been send.
+ * @property {string} getStatus       readonly property that expose the response status
+ *                                    (e.g. 200, 304, ...).
+ * @property {string} getStatusText   readonly property that expose the status text of
+ *                                    the response (e.g. "OK", "Not Modified", ...).
+ * @property {bool}   isReketResponse readonly and internal only property.
  */
 
 /**
@@ -60,17 +60,22 @@
  * @return {ReketResponse}
  */
 
-
-
-export const buildReketResponse = ({ data, config, headers, request, status, statusText }) => {
-  let props = {};
+export const buildReketResponse = ({
+  data,
+  config,
+  headers,
+  request,
+  status,
+  statusText,
+}) => {
+  const props = {};
   let responseData = data;
   let response = {};
 
   // detect type of response data
   if (!Array.isArray(responseData)) {
     // if not an array (Object, string, number, ...)
-    if (typeof responseData !== 'object') {
+    if (typeof responseData !== 'object' || responseData === null) {
       // and not an object (number, string, null, ...).
       // Treat it as an object and wrap data into an object with value as key.
       // If HTTP data response is `"response"` the reket response object will look like:
@@ -129,7 +134,7 @@ export const buildReketResponse = ({ data, config, headers, request, status, sta
       writable: false,
       enumerable: false,
     },
-    '_isReketResponse': {
+    isReketResponse: {
       value: true,
       writable: false,
       enumerable: false,

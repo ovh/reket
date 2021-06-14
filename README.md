@@ -15,15 +15,20 @@ If you don't want to use `axios` client, you can use an other `Reket` client or 
 ### Installation
 
 ```bash
+$ yarn add @ovhcloud/reket-core
 $ yarn add @ovhcloud/reket-axios-client
 ```
 
 ### Usage
 
 ```js
-import Reket from '@ovhcloud/reket-axios-client';
+import { Reket } from '@ovhcloud/reket-core';
+import { AxiosReketClient } from '@ovhcloud/reket-axios-client';
 
-Reket.get('/shi/foo/me') // get method returns a Promise
+const reketInstance = new Reket();
+reketInstance.config.client.set(new AxiosReketClient());
+
+reketInstance.get('/shi/foo/me') // get method returns a Promise
   .then((response) => {
     console.log(response); // response is of type ReketResponse
   });
@@ -33,15 +38,37 @@ Reket.get('/shi/foo/me') // get method returns a Promise
 
 Whatever client you use, you can configure `Reket`.
 
+#### hooks
+
+You can configure (for the moment) a hook on the response that allows you to change the response before it is passed to then/catch.
+
+```js
+import { Reket } from '@ovhcloud/reket-core';
+import { AxiosReketClient } from '@ovhcloud/reket-axios-client';
+
+const reketInstance = new Reket();
+reketInstance.config.hooks.response.set((response) => {
+  // do what you want with the response
+  return response;
+}, (error) => {
+  // do what you want with the error (i.e. check the status code in order to check authentification, etc...)
+  return Promise.reject(error);
+});
+```
+
 #### requestTypes
 
 This configuration is useful to predefine some URL prefixes if you use different APIs or different API versions.
 Consider you have `1.0` API and a `2.0` API, you can configure it like so:
 
 ```js
-import Reket from '@ovhcloud/reket-axios-client';
+import { Reket } from '@ovhcloud/reket-core';
+import { AxiosReketClient } from '@ovhcloud/reket-axios-client';
 
-Reket.setConfig('requestTypes', [
+const reketInstance = new Reket();
+reketInstance.config.client.set(new AxiosReketClient());
+
+reketInstance.config.requestTypes.add([
   {
     type: '1.0',
     urlPrefix: '/1.0',
@@ -71,9 +98,12 @@ Reket.get('/my/v2/route', {
 You can configure a global prefix for your request URL. This prefix will be used if no `requestTypes` are defined or if the serviceType of your request is not found.
 
 ```js
-import Reket from '@ovhcloud/reket-axios-client';
+import { Reket } from '@ovhcloud/reket-core';
+import { AxiosReketClient } from '@ovhcloud/reket-axios-client';
 
-Reket.setConfig('urlPrefix', '/shi/foo/me');
+const reketInstance = new Reket();
+reketInstance.config.urlPrefix.set('/shi/foo/me');
+
 ```
 
 ## How to use a non existing client?
@@ -111,9 +141,9 @@ export class MyHttpLibReketClient extends ReketClient {
   }
 }
 
-export default new Reket({
-  client: new MyHttpLibReketClient(),
-});
+export default {
+  MyHttpLibReketClient,
+};
 ```
 
 That's it!
@@ -121,7 +151,6 @@ All your previous code stay the same, the only change that is made is that the H
 
 ## What's next?
 
-- Create an AngularJS wrapper
 - Add more clients
 
 ## Related links

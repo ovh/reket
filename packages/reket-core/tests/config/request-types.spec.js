@@ -1,14 +1,5 @@
 import { ReketConfigRequestTypes } from '../../src/config/request-types';
 
-describe('ReketConfigRequestTypes implementation', () => {
-  test('it should instanciate a ReketConfigRequestTypes instance', () => {
-    const requestTypesConfig = new ReketConfigRequestTypes();
-
-    expect(requestTypesConfig.size).toBe(0);
-    expect(requestTypesConfig.getDefaultUrlPrefix()).toBe(undefined);
-  });
-});
-
 describe('add method', () => {
   test('it should add a request type with its value', () => {
     const requestTypesConfig = new ReketConfigRequestTypes();

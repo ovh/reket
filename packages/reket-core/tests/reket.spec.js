@@ -1,40 +1,6 @@
 import { Reket } from '../src/reket';
-import { ReketConfig } from '../src/config/config';
 
 import { MockReketClient } from './mocks';
-
-describe('Reket instanciation', () => {
-  test('it should instanciate Reket without configuration', () => {
-    const reketInstance = new Reket();
-
-    expect(reketInstance instanceof Reket).toBe(true);
-    expect(reketInstance.config instanceof ReketConfig).toBe(true);
-    expect(reketInstance.client).toBe(undefined);
-  });
-
-  // test('it should instanciate Reket and configure a client', () => {
-  //   const reketInstance = new Reket();
-  //   reketInstance.client.set(new MockReketClient());
-
-  //   expect(reketInstance.client.get()).not.toBe(undefined);
-  // });
-
-  // test('it should instanciate Reket and configure response hook', () => {
-  //   const reketInstance = new Reket();
-  //   reketInstance.hooks.response.set(() => {}, () => {});
-
-  //   expect(reketInstance.hooks.response.onSuccess).not.toBe(undefined);
-  //   expect(reketInstance.hooks.response.onError).not.toBe(undefined);
-  // });
-
-  // test('it should instanciate Reket and configure requestTypes', () => {
-  //   const reketInstance = new Reket();
-  //   reketInstance.requestTypes.add();
-
-  //   expect(reketInstance.hooks.response.onSuccess).not.toBe(undefined);
-  //   expect(reketInstance.hooks.response.onError).not.toBe(undefined);
-  // });
-});
 
 describe('Reket response hook configuration', () => {
   test('it should launch a request and call response onSuccess hook', () => {

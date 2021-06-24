@@ -1,14 +1,5 @@
 import { ReketHook } from '../src/hook';
 
-describe('ReketHook implementation', () => {
-  test('it should instanciate a ReketHook instance', () => {
-    const reketHook = new ReketHook();
-
-    expect(reketHook.onSuccess).toBe(undefined);
-    expect(reketHook.onError).toBe(undefined);
-  });
-});
-
 describe('set method', () => {
   test('it should define onSuccess function', () => {
     const reketHook = new ReketHook();

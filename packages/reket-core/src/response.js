@@ -17,7 +17,7 @@
 
 /**
  * Creates a response with data exposed and other response attributes exposed as readonly.
- * This format will avoid having to access `response.data`` in order to get the data.
+ * This format will avoid having to access `response.data` in order to get the data.
  * Imagine we have a HTTP with response promise as follow:
  * ```
  * "data": {
@@ -91,7 +91,7 @@ export const buildReketResponse = ({
     }
 
     // build an object with all properties of http call response.
-    // Those propertiess are enumerable in the Object, meaning that `Object.keys(obj)`
+    // Those properties are enumerable in the Object, meaning that `Object.keys(obj)`
     // will list that properties.
     Object.keys(responseData).forEach((attrName) => {
       props[attrName] = {

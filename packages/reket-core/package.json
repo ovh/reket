@@ -1,6 +1,6 @@
 {
   "name": "@ovhcloud/reket-core",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Base classes to override in order to use your preferred client",
   "keywords": [
     "reket",

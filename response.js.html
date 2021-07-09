@@ -1,0 +1,275 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> response.js</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+             
+                <a href="index.html">
+                    <h1 class="navbar-item">Reket</h1>
+                </a>
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    API Documentation
+                </a>
+                
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+                <div class="search-wrapper">
+                    <input id="search" type="text" placeholder="Search docs..." class="input">
+                </div>
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Modules</h3><ul><li><a href="module-core.html">core</a></li><li><a href="module-core_config.html">core/config</a></li></ul><h3>Classes</h3><ul><li><a href="Reket.html">Reket</a></li><li><a href="ReketClient.html">ReketClient</a></li><li><a href="ReketConfig.html">ReketConfig</a></li><li><a href="ReketError.html">ReketError</a></li><li><a href="ReketRequest.html">ReketRequest</a></li></ul><h3>Global</h3><ul><li><a href="global.html#buildReketResponse">buildReketResponse</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>response.js</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Represent a Reket response structure base. Non readonly attributes depend of the HTTP call.
+ * @typedef {Object&lt;string, *>|Array}   ReketResponse
+ *
+ * @property {Object} getConfig       readonly property that expose the original config of
+ *                                    the request.
+ * @property {Object} getHeaders      readonly property that expose the response headers returned
+ *                                    by the HTTP call.
+ * @property {Object} getRequest      readonly property that expose the original request that
+ *                                    has been send.
+ * @property {string} getStatus       readonly property that expose the response status
+ *                                    (e.g. 200, 304, ...).
+ * @property {string} getStatusText   readonly property that expose the status text of
+ *                                    the response (e.g. "OK", "Not Modified", ...).
+ * @property {bool}   isReketResponse readonly and internal only property.
+ */
+
+/**
+ * Creates a response with data exposed and other response attributes exposed as readonly.
+ * This format will avoid having to access `response.data` in order to get the data.
+ * Imagine we have a HTTP with response promise as follow:
+ * ```
+ * "data": {
+ *   "shi": "ming",
+ *   "foo": "bar",
+ *  "me": "zot"
+ * },
+ * "headers": {
+ *   ...
+ * }
+ * ```
+ * To access data in the promise you have to do something like:
+ * ```
+ * Reket.get('/my/url').then((response) => {
+ *   const foo = response.data.foo;
+ *   // or const { foo } = response.data;
+ *   // and then access the headers
+ *   const headers = response.headers;
+ * });
+ * ```
+ *
+ * With ReketResponse format it's possible to get directly foo from response like so:
+ * ```
+ * Reket.get('/my/url').then((response) => {
+ *   const foo = response.foo;
+ *   // or const { foo } = response;
+ *   // and then access the headers
+ *   const headers = response.getHeaders;
+ * });
+ * ```
+ *
+ * @param  {*}      options.data       The data returned by the HTTP call.
+ * @param  {Object} options.config     The original config of the request.
+ * @param  {Object} options.headers    The response headers returned by the HTTP call.
+ * @param  {Object} options.request    The original request that has been send.
+ * @param  {string} options.status     The response status (e.g. 200, 304, ...)
+ * @param  {string} options.statusText The status text of the response (e.g. "OK",
+ *                                     "Not Modified", ...)
+ *
+ * @return {ReketResponse}
+ */
+
+export const buildReketResponse = ({
+  data,
+  config,
+  headers,
+  request,
+  status,
+  statusText,
+}) => {
+  const props = {};
+  let responseData = data;
+  let response = {};
+
+  // detect type of response data
+  if (!Array.isArray(responseData)) {
+    // if not an array (Object, string, number, ...)
+    if (typeof responseData !== 'object' || responseData === null) {
+      // and not an object (number, string, null, ...).
+      // Treat it as an object and wrap data into an object with value as key.
+      // If HTTP data response is `"response"` the reket response object will look like:
+      //
+      // ```
+      // {
+      //   value: 'response'
+      // }
+      // ```
+      responseData = {
+        value: responseData,
+      };
+    }
+
+    // build an object with all properties of http call response.
+    // Those properties are enumerable in the Object, meaning that `Object.keys(obj)`
+    // will list that properties.
+    Object.keys(responseData).forEach((attrName) => {
+      props[attrName] = {
+        value: responseData[attrName],
+        writable: true,
+        enumerable: true,
+      };
+    });
+
+    Object.defineProperties(response, props);
+  } else {
+    // if response data is an array, do not modify it's prototype.
+    response = data;
+  }
+
+  // define the readonly properties of the response.
+  Object.defineProperties(response, {
+    getConfig: {
+      value: config,
+      writable: false,
+      enumerable: false,
+    },
+    getHeaders: {
+      value: headers,
+      writable: false,
+      enumerable: false,
+    },
+    getRequest: {
+      value: request,
+      writable: false,
+      enumerable: false,
+    },
+    getStatus: {
+      value: status,
+      writable: false,
+      enumerable: false,
+    },
+    getStatusText: {
+      value: statusText,
+      writable: false,
+      enumerable: false,
+    },
+    isReketResponse: {
+      value: true,
+      writable: false,
+      enumerable: false,
+    },
+  });
+
+  return response;
+};
+
+export default {
+  buildReketResponse,
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a></p>
+                    <p class="sidebar-created-by">
+                        <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by 
+                        <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+<script src="scripts/search.js"> </script>
+
+</body>
+</html>

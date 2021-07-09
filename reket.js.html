@@ -1,0 +1,342 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> reket.js</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+             
+                <a href="index.html">
+                    <h1 class="navbar-item">Reket</h1>
+                </a>
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    API Documentation
+                </a>
+                
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+                <div class="search-wrapper">
+                    <input id="search" type="text" placeholder="Search docs..." class="input">
+                </div>
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Modules</h3><ul><li><a href="module-core.html">core</a></li><li><a href="module-core_config.html">core/config</a></li></ul><h3>Classes</h3><ul><li><a href="Reket.html">Reket</a></li><li><a href="ReketClient.html">ReketClient</a></li><li><a href="ReketConfig.html">ReketConfig</a></li><li><a href="ReketError.html">ReketError</a></li><li><a href="ReketRequest.html">ReketRequest</a></li></ul><h3>Global</h3><ul><li><a href="global.html#buildReketResponse">buildReketResponse</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>reket.js</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { ReketConfig } from './config';
+import { ReketRequest } from './request';
+
+/**
+ * @class  Reket
+ * @classdesc
+ * Main class of the component. This class implements all CRUD methods (get, post, put, delete).
+ *
+ * Simply configure a client (at least) and you will be able to make HTTP calls.
+ *
+ * @constructor
+ * @param {ReketConfig|Object} config An instance of ReketConfig instance or an object with the
+ *                                    options for creating a ReketConfig instance.
+ * @see {@link ReketConfig} constructor for available options in case of `config`
+ *                          parameter is an Object.
+ */
+export class Reket {
+  /**
+   * Configuration used by Reket instance.
+   *
+   * @name Reket#config
+   * @type {ReketConfig}
+   * @readonly
+   */
+  #config = new ReketConfig();
+
+  get config() {
+    return this.#config;
+  }
+
+  /**
+   * Shortcut to get the configured client from config.
+   *
+   * @name Reket#client
+   * @type {ReketClient}
+   * @readonly
+   */
+  get client() {
+    return this.#config.client.value;
+  }
+
+  get hooks() {
+    return this.#config.hooks;
+  }
+
+  get requestTypes() {
+    return this.#config.requestTypes;
+  }
+
+  get urlPrefix() {
+    return this.#config.urlPrefix.value;
+  }
+
+  getRequestUrlPrefix(reketRequest) {
+    // get the url prefix of the http request if defined
+    if (reketRequest.urlPrefix) {
+      return reketRequest.urlPrefix;
+    }
+
+    // return the global configured url prefix
+    // if no requests types defined
+    if (!this.requestTypes.size) {
+      return this.urlPrefix || '';
+    }
+
+    // get the prefix from request request type
+    if (reketRequest.requestType) {
+      return (
+        this.requestTypes.getUrlPrefix(reketRequest.requestType) ||
+        this.urlPrefix
+      );
+    }
+
+    // return the url prefix from the default requestType (the first one of the list)
+    return this.requestTypes.getDefaultUrlPrefix() || '';
+  }
+
+  /**
+   * Send an HTTP request with the configured client.
+   * @param  {ReketRequest} reketRequest An instance of ReketRequest as options.
+   * @return {Promise}  That returns an instance of ReketResponse in case of success,
+   *                    an instance ReketError in case of error.
+   */
+  request(reketRequest) {
+    // determine url from request options
+    Object.assign(reketRequest, {
+      url: `${this.getRequestUrlPrefix(reketRequest)}${reketRequest.url}`,
+    });
+
+    return this.client
+      .request(reketRequest)
+      .then((reketResponse) => {
+        if (!reketResponse.isReketResponse) {
+          throw new Error(
+            'Your client request must return a ReketResponse type by using buildReketResponse method.',
+          );
+        }
+
+        return this.hooks.response.onSuccess
+          ? this.hooks.response.onSuccess(reketResponse)
+          : reketResponse;
+      })
+      .catch((reketError) =>
+        this.hooks.response.onError
+          ? this.hooks.response.onError(reketError)
+          : Promise.reject(reketError),
+      );
+  }
+
+  /**
+   * Send a GET request.
+   * @param  {string|ReketRequest} urlOrReketRequest  An url to GET or an instance of ReketRequest
+   *                                                  that will be passed to request method.
+   * @param  {Object}              [options={}]       Options for creating an instance of
+   *                                                  ReketRequest in case of urlOrReketRequest
+   *                                                  parameter is a string.
+   * @return {Promise}  Promise returned by request method.
+   */
+  get(urlOrReketRequest, options = {}) {
+    let reketRequest = urlOrReketRequest;
+
+    if (typeof reketRequest === 'string') {
+      reketRequest = new ReketRequest(reketRequest, options);
+    }
+
+    // set HTTP method to GET
+    reketRequest.setMethod('GET');
+
+    return this.request(reketRequest);
+  }
+
+  /**
+   * Send a POST request.
+   * @param  {string|ReketRequest} urlOrReketRequest  An url where to POST or an instance of
+   *                                                  ReketRequest that will be passed to
+   *                                                  request method.
+   * @param  {Object}              [data={}]          Data to be sent as the request message data.
+   * @param  {Object}              [options={}]       Options for creating an instance of
+   *                                                  ReketRequest in case of urlOrReketRequest
+   *                                                  parameter is a string.
+   * @return {Promise}  Promise returned by request method.
+   */
+  post(urlOrReketRequest, data = {}, options = {}) {
+    let reketRequest = urlOrReketRequest;
+
+    if (typeof reketRequest === 'string') {
+      reketRequest = new ReketRequest(reketRequest, options);
+    }
+
+    // set HTTP method to POST
+    reketRequest.setMethod('POST');
+
+    // set data to be sent as the request message data
+    if (!reketRequest.data) {
+      reketRequest.setData(data);
+    }
+
+    return this.request(reketRequest);
+  }
+
+  /**
+   * Send a PUT request.
+   * @param  {string|ReketRequest} urlOrReketRequest  An url where to PUT or an instance of
+   *                                                  ReketRequest that will be passed to
+   *                                                  request method.
+   * @param  {Object}              [data={}]          Data to be sent as the request message data.
+   * @param  {Object}              [options={}]       Options for creating an instance of
+   *                                                  ReketRequest in case of urlOrReketRequest
+   *                                                  parameter is a string.
+   * @return {Promise}  Promise returned by request method.
+   */
+  put(urlOrReketRequest, data = {}, options = {}) {
+    let reketRequest = urlOrReketRequest;
+
+    if (typeof reketRequest === 'string') {
+      reketRequest = new ReketRequest(reketRequest, options);
+    }
+
+    // set HTTP method to PUT
+    reketRequest.setMethod('PUT');
+
+    // set data to be sent as the request message data
+    if (!reketRequest.data) {
+      reketRequest.setData(data);
+    }
+
+    return this.request(reketRequest);
+  }
+
+  /**
+   * Send a DELETE request.
+   * @param  {string|ReketRequest} urlOrReketRequest  An url where to DELETE or an instance of
+   *                                                  ReketRequest that will be passed to
+   *                                                  request method.
+   * @param  {Object}              [options={}]       Options for creating an instance of
+   *                                                  ReketRequest in case of urlOrReketRequest
+   *                                                  parameter is a string.
+   * @return {Promise}  Promise returned by request method.
+   */
+  delete(urlOrReketRequest, options = {}) {
+    let reketRequest = urlOrReketRequest;
+
+    if (typeof reketRequest === 'string') {
+      reketRequest = new ReketRequest(reketRequest, options);
+    }
+
+    // set HTTP method to DELETE
+    reketRequest.setMethod('DELETE');
+
+    return this.request(reketRequest);
+  }
+}
+
+export default {
+  Reket,
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a></p>
+                    <p class="sidebar-created-by">
+                        <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by 
+                        <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+<script src="scripts/search.js"> </script>
+
+</body>
+</html>

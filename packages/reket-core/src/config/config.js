@@ -1,4 +1,3 @@
-import { ReketConfigClient } from './client';
 import { ReketConfigHooks } from './hooks';
 import { ReketConfigItem } from './item';
 import { ReketConfigRequestTypes } from './request-types';
@@ -18,9 +17,9 @@ export class ReketConfig {
   #config = new Map();
 
   /**
-   * The ReketConfigClient instance that will be used for making HTTP requests.
+   * The ReketConfigItem that store the client instance that will be used for making HTTP requests.
    * @name ReketConfig#client
-   * @type {ReketConfigClient}
+   * @type {ReketConfigItem}
    * @readonly
    */
   get client() {
@@ -58,7 +57,7 @@ export class ReketConfig {
   }
 
   constructor() {
-    this.#config.set('client', new ReketConfigClient());
+    this.#config.set('client', new ReketConfigItem());
     this.#config.set('hooks', new ReketConfigHooks());
     this.#config.set('requestTypes', new ReketConfigRequestTypes());
     this.#config.set('urlPrefix', new ReketConfigItem());

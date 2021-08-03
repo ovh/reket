@@ -1,6 +1,6 @@
 {
   "name": "@ovhcloud/reket-axios-client",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "axios client implementation for Reket",
   "keywords": [
     "reket",
@@ -24,7 +24,7 @@
     "test": "jest --config ../../jest.config.js"
   },
   "dependencies": {
-    "@ovhcloud/reket-core": "^0.2.0",
+    "@ovhcloud/reket-core": "^0.2.1",
     "axios": "^0.21.1"
   },
   "devDependencies": {

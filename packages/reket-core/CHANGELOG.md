@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.1](https://github.com/ovh/reket/compare/v0.2.0...v0.2.1) (2021-08-03)
+
+
+### Bug Fixes
+
+* **core:** remove runtime type check ([#15](https://github.com/ovh/reket/issues/15)) ([0c5ee7e](https://github.com/ovh/reket/commit/0c5ee7e3718a755f3fddaa0190d6df937eb9710f))
+
+
+
+
+
 # [0.2.0](https://github.com/ovh/reket/compare/v0.1.1...v0.2.0) (2021-07-09)
 
 
